@@ -1,0 +1,43 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "CoreExtensions",
+        "repositoryURL": "https://github.com/aetherealtech/SwiftCoreExtensions.git",
+        "state": {
+          "branch": "master",
+          "revision": "b588a40070fecc2ce3b89b8c29686aa33acec1d8",
+          "version": null
+        }
+      },
+      {
+        "package": "EventStreams",
+        "repositoryURL": "https://github.com/aetherealtech/SwiftEventStreams.git",
+        "state": {
+          "branch": "master",
+          "revision": "2cd8e5cecd121b1408bee0031fab8a393c69cf4d",
+          "version": null
+        }
+      },
+      {
+        "package": "Observer",
+        "repositoryURL": "https://github.com/aetherealtech/SwiftObserver.git",
+        "state": {
+          "branch": "master",
+          "revision": "13a60c1d74a6b010130437d9f9595da9349d5eeb",
+          "version": null
+        }
+      },
+      {
+        "package": "Scheduling",
+        "repositoryURL": "https://github.com/aetherealtech/SwiftScheduling.git",
+        "state": {
+          "branch": "master",
+          "revision": "fda79bde1bb177c625e8d54d8fbc086382532bf8",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}
