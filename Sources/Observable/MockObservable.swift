@@ -58,7 +58,7 @@ import Observer
         _subscribeInvocations.removeAll()
     }
 
-    private var _getWrappedValueInvocations = [Void]()
+    private var _getWrappedValueInvocations: [Void] = [Void]()
     private var _setWrappedValueInvocations = [T]()
     private var _subscribeInvocations = [(T) -> Void]()
 }
