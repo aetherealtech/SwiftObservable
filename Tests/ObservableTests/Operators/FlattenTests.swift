@@ -10,7 +10,7 @@ class FlattenTests: XCTestCase {
 
     class TestObservables {
 
-        @MutableObservable var source: MutableObservable<Int> = MutableObservable(wrappedValue: 8)
+        @StoredObservable var source: StoredObservable<Int> = StoredObservable(wrappedValue: 8)
         @AnyObservable var flattened: Int
         
         init() {
@@ -26,7 +26,7 @@ class FlattenTests: XCTestCase {
 
         for outerValue in 0..<10 {
             
-            observables.source = MutableObservable(wrappedValue: outerValue)
+            observables.source = StoredObservable(wrappedValue: outerValue)
             XCTAssertEqual(observables.flattened, outerValue)
             
             for innerValue in 50...65 {
@@ -65,7 +65,7 @@ class FlattenTests: XCTestCase {
         
         for outerValue in 0..<10 {
             
-            observables.source = MutableObservable(wrappedValue: outerValue)
+            observables.source = StoredObservable(wrappedValue: outerValue)
             expectedValues.append(outerValue)
             
             for innerValue in 50...65 {
@@ -80,6 +80,8 @@ class FlattenTests: XCTestCase {
         }
         
         XCTAssertEqual(receivedValues, expectedValues)
+        
+        withExtendedLifetime(subscription) { }
     }
     
     func testPublishUpdates() throws {
@@ -100,7 +102,7 @@ class FlattenTests: XCTestCase {
         
         for outerValue in 0..<10 {
             
-            observables.source = MutableObservable(wrappedValue: outerValue)
+            observables.source = StoredObservable(wrappedValue: outerValue)
             expectedValues.append(outerValue)
             
             for innerValue in 50...65 {
@@ -111,5 +113,7 @@ class FlattenTests: XCTestCase {
         }
                 
         XCTAssertEqual(receivedValues, expectedValues)
+        
+        withExtendedLifetime(subscription) { }
     }
 }

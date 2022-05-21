@@ -6,33 +6,41 @@ import Foundation
 import EventStreams
 import Observer
 
-extension Observable {
+extension MutableObservable {
 
-    public func map<T2>(_ transform: @escaping (T) -> T2) -> AnyObservable<T2> {
+    public func mutableMap<T2>(
+        _ transform: @escaping (T) -> T2,
+        _ inverseTransform: @escaping (T2) -> T
+    ) -> AnyMutableObservable<T2> {
 
-        MappedObservable(
+        MutableMappedObservable(
             source: self,
-            transform: transform
+            transform: transform,
+            inverseTransform: inverseTransform
         ).erase()
     }
 }
 
-class MappedObservable<Source, Result> : Observable {
+class MutableMappedObservable<Source, Result> : MutableObservable {
 
     typealias T = Result
 
     var wrappedValue: Result {
 
-        transform(source.wrappedValue)
+        get { transform(source.wrappedValue) }
+        set { source.wrappedValue = inverseTransform(newValue) }
     }
 
-    init<SourceValue: Observable>(
+    init<SourceValue: MutableObservable>(
         source: SourceValue,
-        transform: @escaping (Source) -> Result
+        transform: @escaping (Source) -> Result,
+        inverseTransform: @escaping (Result) -> Source
     ) where SourceValue.T == Source {
 
         self.source = source.erase()
+
         self.transform = transform
+        self.inverseTransform = inverseTransform
         
         self.subscriber = BroadcastSubscriber(sourceSubscriptionProvider: { handler in
             
@@ -45,8 +53,10 @@ class MappedObservable<Source, Result> : Observable {
         subscriber.subscribe(handler)
     }
 
-    private let source: AnyObservable<Source>
+    private let source: AnyMutableObservable<Source>
+
     private let transform: (Source) -> Result
+    private let inverseTransform: (Result) -> Source
     
     private let subscriber: BroadcastSubscriber<Result>
 }

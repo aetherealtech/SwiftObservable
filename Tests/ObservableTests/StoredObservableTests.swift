@@ -6,11 +6,11 @@ import XCTest
 
 @testable import Observable
 
-class MutableObservableTests: XCTestCase {
+class StoredObservableTests: XCTestCase {
 
     class TestObservables {
 
-        @MutableObservable var source: Int = 8
+        @StoredObservable var source: Int = 8
     }
 
     func testValue() throws {
@@ -58,6 +58,8 @@ class MutableObservableTests: XCTestCase {
         }
         
         XCTAssertEqual(receivedValues, expectedValues)
+        
+        withExtendedLifetime(subscription) { }
     }
     
     func testPublishUpdates() throws {
@@ -74,12 +76,14 @@ class MutableObservableTests: XCTestCase {
                 receivedValues.append(value)
             }
          
-        var expectedValues = Array(50...65)
+        let expectedValues = Array(50...65)
         
         for value in expectedValues {
             observables.source = value
         }
                 
         XCTAssertEqual(receivedValues, expectedValues)
+        
+        withExtendedLifetime(subscription) { }
     }
 }

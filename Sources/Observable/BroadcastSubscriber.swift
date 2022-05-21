@@ -8,7 +8,7 @@ import CoreExtensions
 import EventStreams
 import Observer
 
-class BroadcastSubsciber<Event> {
+class BroadcastSubscriber<Event> {
 
     init(sourceSubscriptionProvider: @escaping (@escaping (Event) -> Void) -> Subscription) {
 
@@ -31,7 +31,7 @@ class BroadcastSubsciber<Event> {
     private class BroadcastSubscription : Subscription {
 
         init(
-            subscriber: BroadcastSubsciber<Event>,
+            subscriber: BroadcastSubscriber<Event>,
             handler: @escaping (Event) -> Void
         ) {
 
@@ -65,7 +65,7 @@ class BroadcastSubsciber<Event> {
             }
         }
 
-        private weak var subscriber: BroadcastSubsciber<Event>?
+        private weak var subscriber: BroadcastSubscriber<Event>?
         private let handler: (Event) -> Void
     }
     

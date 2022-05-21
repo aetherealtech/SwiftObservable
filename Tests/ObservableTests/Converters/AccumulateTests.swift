@@ -14,7 +14,7 @@ class AccumulateTests: XCTestCase {
 
         let initialValue = 15
 
-        let source: AnyTypedChannel<Int> = SimpleChannel().asTypedChannel()
+        let source = SimpleChannel<Int>()
         let sourceStream: EventStream<Int>
 
         @AnyObservable var accumulated: Int
@@ -22,9 +22,6 @@ class AccumulateTests: XCTestCase {
         init() {
 
             sourceStream = source.asStream()
-
-            var channel: AnyTypedChannel<Int> = SimpleChannel()
-                .asTypedChannel()
 
             _accumulated = sourceStream
                 .accumulate(
@@ -41,7 +38,7 @@ class AccumulateTests: XCTestCase {
         var expectedValue = observables.initialValue
         XCTAssertEqual(observables.accumulated, expectedValue)
 
-        for value in 0..<10 {
+        for _ in 0..<10 {
 
             let increment = Int.random(in: 5..<50)
             observables.source.publish(increment)
@@ -78,7 +75,7 @@ class AccumulateTests: XCTestCase {
 
         var expectedValues = [Int]()
 
-        for value in 0..<10 {
+        for _ in 0..<10 {
 
             let increment = Int.random(in: 5..<50)
             observables.source.publish(increment)
@@ -92,6 +89,8 @@ class AccumulateTests: XCTestCase {
         }
 
         XCTAssertEqual(receivedValues, expectedValues)
+        
+        withExtendedLifetime(subscription) { }
     }
 
     func testPublishUpdates() throws {
@@ -112,7 +111,7 @@ class AccumulateTests: XCTestCase {
 
         var expectedValues = [Int]()
 
-        for value in 0..<10 {
+        for _ in 0..<10 {
 
             let increment = Int.random(in: 5..<50)
             observables.source.publish(increment)
@@ -122,5 +121,7 @@ class AccumulateTests: XCTestCase {
         }
 
         XCTAssertEqual(receivedValues, expectedValues)
+        
+        withExtendedLifetime(subscription) { }
     }
 }

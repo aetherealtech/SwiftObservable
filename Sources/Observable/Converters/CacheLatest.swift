@@ -31,7 +31,7 @@ class CacheLatestObservable<T> : Observable {
 
         self.source = source
         
-        let result = MutableObservable(wrappedValue: initialValue)
+        let result = StoredObservable(wrappedValue: initialValue)
         self.result = result
 
         self.subscription = source
@@ -43,12 +43,7 @@ class CacheLatestObservable<T> : Observable {
         result.subscribeActual(handler)
     }
 
-//    func publishUpdates() -> EventStream<T> {
-//
-//        source
-//    }
-
     private let source: EventStream<T>
-    private let result: MutableObservable<T>
+    private let result: StoredObservable<T>
     private let subscription: Subscription
 }

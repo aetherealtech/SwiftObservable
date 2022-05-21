@@ -6,40 +6,57 @@ import Foundation
 import EventStreams
 import Observer
 
-@propertyWrapper public class MutableObservable<T> : Observable {
+public protocol MutableObservable : Observable {
 
-    public var wrappedValue: T {
+    var wrappedValue: T { get set }
+}
 
-        get { _value }
-        set {
-
-            _value = newValue
-            channel.publish(newValue)
-        }
-    }
+extension MutableObservable {
 
     public var value: T {
         get { wrappedValue }
         set { wrappedValue = newValue }
     }
+}
 
-    public var projectedValue: MutableObservable<T> {
+@propertyWrapper public class AnyMutableObservable<T> : MutableObservable {
 
-        self
+    public var wrappedValue: T {
+
+        get { getWrappedValue() }
+        set { setWrappedValue(newValue) }
     }
 
-    public init(wrappedValue: T) {
+    public var projectedValue: AnyMutableObservable<T> {
 
-        self._value = wrappedValue
+        self
     }
 
     public func subscribeActual(
         _ handler: @escaping (T) -> Void
     ) -> Subscription {
 
-        channel.subscribe(handler)
+        subscribeActualImp(handler)
     }
 
-    private var _value: T
-    private let channel: AnyTypedChannel<T> = SimpleChannel().asTypedChannel()
+    public init<Erasing: MutableObservable>(erasing: Erasing) where Erasing.T == T {
+
+        getWrappedValue = { erasing.wrappedValue }
+        setWrappedValue = { newValue in erasing.wrappedValue = newValue }
+
+        subscribeActualImp = { handler in erasing.subscribeActual(handler) }
+    }
+
+    private let getWrappedValue: () -> T
+    private let setWrappedValue: (T) -> Void
+
+    private let subscribeActualImp: (@escaping (T) -> Void) -> Subscription
+}
+
+extension MutableObservable {
+
+    func erase() -> AnyMutableObservable<T> {
+
+        AnyMutableObservable(erasing: self)
+    }
 }

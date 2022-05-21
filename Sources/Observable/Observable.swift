@@ -8,7 +8,7 @@ import EventStreams
 import Observer
 import Scheduling
 
-public protocol Observable {
+public protocol Observable : AnyObject {
 
     associatedtype T
 
@@ -78,33 +78,29 @@ extension Observable {
 
     public func publishUpdates() -> EventStream<T> {
 
-        EventStream(
-            registerValues: { publish, _ in
-
-                ObservableUpdates(
-                    source: self,
-                    publish: publish
-                )
-            },
-            unregister: { source in
-
-            }
+        ObservableUpdatesStream(
+            source: self
         )
     }
 }
 
-class ObservableUpdates<SourceObservable: Observable>
+class ObservableUpdatesStream<SourceObservable: Observable> : EventStream<SourceObservable.T>
 {
     init(
-        source: SourceObservable,
-        publish: @escaping (SourceObservable.T) -> Void
+        source: SourceObservable
     ) {
 
         self.source = source
 
-        self.sourceSubscription = source.subscribe(publish)
+        let channel = SimpleChannel<Event<SourceObservable.T>>()
+
+        self.sourceSubscription = source.subscribe(channel.publish)
+
+        super.init(
+            channel: channel
+        )
     }
 
-    let source: SourceObservable
-    let sourceSubscription: Subscription
+    private let source: SourceObservable
+    private let sourceSubscription: Subscription
 }

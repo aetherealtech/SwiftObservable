@@ -10,10 +10,10 @@ class FlatMapTests: XCTestCase {
 
     class TestObservables {
 
-        @MutableObservable var source: Int = 0
+        @StoredObservable var source: Int = 0
         @AnyObservable var flatMapped: String
 
-        let innerValues: [MutableObservable<String>] = (0..<10).map { _ in MutableObservable<String>(wrappedValue: "") }
+        let innerValues: [StoredObservable<String>] = (0..<10).map { _ in StoredObservable<String>(wrappedValue: "") }
 
         let transform: (Int) -> AnyObservable<String>
 
@@ -90,6 +90,8 @@ class FlatMapTests: XCTestCase {
         }
         
         XCTAssertEqual(receivedValues, expectedValues)
+        
+        withExtendedLifetime(subscription) { }
     }
     
     func testPublishUpdates() throws {
@@ -122,5 +124,7 @@ class FlatMapTests: XCTestCase {
         }
                 
         XCTAssertEqual(receivedValues, expectedValues)
+        
+        withExtendedLifetime(subscription) { }
     }
 }

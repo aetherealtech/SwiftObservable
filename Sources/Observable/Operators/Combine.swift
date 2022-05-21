@@ -70,7 +70,7 @@ class CombinedObservable<T1, T2> : Observable {
         self.source1 = source1.erase()
         self.source2 = source2.erase()
         
-        self.subscriber = BroadcastSubsciber(sourceSubscriptionProvider: { handler in
+        self.subscriber = BroadcastSubscriber(sourceSubscriptionProvider: { handler in
 
             let subscription1 = source1.subscribeActual { source1 in handler((source1, source2.wrappedValue)) }
             let subscription2 = source2.subscribeActual { source2 in handler((source1.wrappedValue, source2)) }
@@ -102,7 +102,7 @@ class CombinedObservable<T1, T2> : Observable {
     private let source1: AnyObservable<T1>
     private let source2: AnyObservable<T2>
     
-    private let subscriber: BroadcastSubsciber<T>
+    private let subscriber: BroadcastSubscriber<T>
 }
 
 extension Array where Element: Observable {
@@ -129,7 +129,7 @@ class ArrayObservable<Element> : Observable {
         
         self.sources = sources.map { source in source.erase() }
         
-        self.subscriber = BroadcastSubsciber(sourceSubscriptionProvider: { handler in
+        self.subscriber = BroadcastSubscriber(sourceSubscriptionProvider: { handler in
 
             let subscriptions = sources.enumerated().map { index, source in
                 
@@ -157,22 +157,6 @@ class ArrayObservable<Element> : Observable {
         subscriber.subscribe(handler)
     }
 
-//    func publishUpdates() -> EventStream<[Element]> {
-//
-//        let updates = sources.map { source in source.publishUpdates() }
-//
-//        return updates
-//            .combineLatest()
-//            .map { values in
-//
-//                let captureUpdates = updates
-//
-//                return values
-//            }
-//    }
-
     private let sources: [AnyObservable<Element>]
-    
-    private let subscriber: BroadcastSubsciber<T>
+    private let subscriber: BroadcastSubscriber<T>
 }
-

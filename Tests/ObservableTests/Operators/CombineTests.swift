@@ -10,8 +10,8 @@ class CombineTests: XCTestCase {
 
     class TestObservables {
 
-        @MutableObservable var source1: Int = 0
-        @MutableObservable var source2: String = ""
+        @StoredObservable var source1: Int = 0
+        @StoredObservable var source2: String = ""
 
         @AnyObservable var combined: (Int, String)
 
@@ -90,6 +90,8 @@ class CombineTests: XCTestCase {
             actual.0 == expected.0 &&
                 actual.1 == expected.1
         })
+        
+        withExtendedLifetime(subscription) { }
     }
     
     func testPublishUpdates() throws {
@@ -127,5 +129,7 @@ class CombineTests: XCTestCase {
             actual.0 == expected.0 &&
                 actual.1 == expected.1
         })
+        
+        withExtendedLifetime(subscription) { }
     }
 }

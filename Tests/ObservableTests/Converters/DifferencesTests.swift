@@ -11,7 +11,7 @@ class DifferencesTests: XCTestCase {
 
     class TestObservables {
 
-        @MutableObservable var source: Int = 0
+        @StoredObservable var source: Int = 0
 
         let differences: EventStream<Int>
 
@@ -38,7 +38,7 @@ class DifferencesTests: XCTestCase {
 
         var expectedValues = [Int]()
 
-        for value in 0..<10 {
+        for _ in 0..<10 {
 
             let nextValue = Int.random(in: 5..<50)
             let difference = nextValue - currentValue
@@ -49,5 +49,7 @@ class DifferencesTests: XCTestCase {
         }
 
         XCTAssertEqual(receivedValues, expectedValues)
+        
+        withExtendedLifetime(subscription) { }
     }
 }

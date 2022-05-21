@@ -10,7 +10,7 @@ class CombineArrayTests: XCTestCase {
 
     class TestObservables {
 
-        let sources: [MutableObservable<Int>] = (0..<10).map { _ in MutableObservable(wrappedValue: 0) }
+        let sources: [StoredObservable<Int>] = (0..<10).map { _ in StoredObservable(wrappedValue: 0) }
 
         @AnyObservable var combined: [Int]
 
@@ -84,6 +84,8 @@ class CombineArrayTests: XCTestCase {
         }
         
         XCTAssertEqual(receivedValues, expectedValues)
+        
+        withExtendedLifetime(subscription) { }
     }
     
     func testPublishUpdates() throws {
@@ -116,5 +118,7 @@ class CombineArrayTests: XCTestCase {
         }
 
         XCTAssertEqual(receivedValues, expectedValues)
+        
+        withExtendedLifetime(subscription) { }
     }
 }

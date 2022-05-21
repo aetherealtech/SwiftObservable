@@ -14,7 +14,7 @@ class CacheLatestTests: XCTestCase {
 
         let initialValue = 15
 
-        let source: AnyTypedChannel<Int> = SimpleChannel().asTypedChannel()
+        let source = SimpleChannel<Int>()
         let sourceStream: EventStream<Int>
 
         @AnyObservable var cachedLatest: Int
@@ -22,9 +22,6 @@ class CacheLatestTests: XCTestCase {
         init() {
 
             sourceStream = source.asStream()
-
-            var channel: AnyTypedChannel<Int> = SimpleChannel()
-                .asTypedChannel()
 
             _cachedLatest = sourceStream
                 .cacheLatest(initialValue: initialValue)
@@ -85,6 +82,8 @@ class CacheLatestTests: XCTestCase {
         }
 
         XCTAssertEqual(receivedValues, expectedValues)
+        
+        withExtendedLifetime(subscription) { }
     }
 
     func testPublishUpdates() throws {
@@ -112,5 +111,7 @@ class CacheLatestTests: XCTestCase {
         }
 
         XCTAssertEqual(receivedValues, expectedValues)
+        
+        withExtendedLifetime(subscription) { }
     }
 }

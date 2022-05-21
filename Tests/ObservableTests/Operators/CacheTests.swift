@@ -19,8 +19,7 @@ class CacheTests: XCTestCase {
 
         init() {
 
-            var channel: AnyTypedChannel<Int> = SimpleChannel()
-                .asTypedChannel()
+            let channel = SimpleChannel<Int>()
 
             let source = _source
 
@@ -99,37 +98,8 @@ class CacheTests: XCTestCase {
         }
         
         XCTAssertEqual(receivedValues, expectedValues)
-    }
-    
-    func testPublishUpdates() throws {
 
-        let observables = TestObservables()
-
-        let publishedUpdates = observables.$cached.publishUpdates()
-        
-        var receivedValues = [Int]()
-
-        let subscription = publishedUpdates
-            .subscribe { value in
-
-                receivedValues.append(value)
-            }
-
-        var expectedValues = [Int]()
-
-        for value in 0..<10 {
-
-            let currentReceivedValues = receivedValues
-            observables.source = value
-            XCTAssertEqual(receivedValues, currentReceivedValues)
-
-            observables.scheduler.process()
-            observables.scheduler.reset()
-
-            expectedValues.append(value)
-        }
-
-        XCTAssertEqual(receivedValues, expectedValues)
+        withExtendedLifetime(subscription) { }
     }
 
     func testValueIsCached() throws {
@@ -137,7 +107,7 @@ class CacheTests: XCTestCase {
         let observables = TestObservables()
 
         observables.$source.reset()
-        let value = observables.cached
+        _ = observables.cached
 
         XCTAssertEqual(observables.$source.getWrappedValueInvocations.count, 0)
     }

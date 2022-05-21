@@ -6,19 +6,20 @@ import XCTest
 
 @testable import Observable
 
-class MapTests: XCTestCase {
+class MutableMapTests: XCTestCase {
 
     class TestObservables {
 
         @StoredObservable var source: Int = 8
-        @AnyObservable var mapped: String
+        @AnyMutableObservable var mapped: String
 
         let transform: (Int) -> String = { intValue in "\(intValue)" }
+        let inverseTransform: (String) -> Int = { stringValue in Int(stringValue)! }
         
         init() {
 
             _mapped = _source
-                .map(transform)
+                .mutableMap(transform, inverseTransform)
         }
     }
     
@@ -31,6 +32,16 @@ class MapTests: XCTestCase {
             XCTAssertEqual(observables.mapped, observables.transform(value))
         }
     }
+
+    func testInverseValue() throws {
+
+        let observables = TestObservables()
+
+        for value in 50...65 {
+            observables.mapped = observables.transform(value)
+            XCTAssertEqual(observables.source, value)
+        }
+    }
     
     func testUpdate() throws {
 
@@ -41,58 +52,72 @@ class MapTests: XCTestCase {
 
         validateUpdates(includeInitial: true)
     }
-    
+
+    func testInverseUpdate() throws {
+
+        validateInverseUpdates(includeInitial: false)
+    }
+
+    func testInverseUpdateWithInitial() throws {
+
+        validateInverseUpdates(includeInitial: true)
+    }
+
     private func validateUpdates(includeInitial: Bool) {
-        
+
         let observables = TestObservables()
 
         var receivedValues = [String]()
 
         let subscription = observables.$mapped
-            .subscribe(notifyImmediately: includeInitial) { value in
+                .subscribe(notifyImmediately: includeInitial) { value in
 
-                receivedValues.append(value)
-            }
- 
+                    receivedValues.append(value)
+                }
+
         let initialValue = observables.source
-        
+
         var expectedValues = Array(50...65)
-        
+
         for value in expectedValues {
             observables.source = value
         }
-        
+
         if includeInitial {
             expectedValues.insert(initialValue, at: 0)
         }
-        
+
         XCTAssertEqual(receivedValues, expectedValues.map(observables.transform))
-        
+
         withExtendedLifetime(subscription) { }
     }
-    
-    func testPublishUpdates() throws {
+
+    private func validateInverseUpdates(includeInitial: Bool) {
 
         let observables = TestObservables()
 
-        let publishedUpdates = observables.$mapped.publishUpdates()
-        
-        var receivedValues = [String]()
+        var receivedValues = [Int]()
 
-        let subscription = publishedUpdates
-            .subscribe { value in
+        let subscription = observables.$source
+                .subscribe(notifyImmediately: includeInitial) { value in
 
-                receivedValues.append(value)
-            }
-         
-        let expectedValues = Array(50...65)
-        
+                    receivedValues.append(value)
+                }
+
+        let initialValue = observables.mapped
+
+        var expectedValues = (50...65).map(observables.transform)
+
         for value in expectedValues {
-            observables.source = value
+            observables.mapped = value
         }
-                
-        XCTAssertEqual(receivedValues, expectedValues.map(observables.transform))
-        
+
+        if includeInitial {
+            expectedValues.insert(initialValue, at: 0)
+        }
+
+        XCTAssertEqual(receivedValues, expectedValues.map(observables.inverseTransform))
+
         withExtendedLifetime(subscription) { }
     }
 }

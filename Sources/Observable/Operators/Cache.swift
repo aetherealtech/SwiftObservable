@@ -37,7 +37,7 @@ class CachedObservable<T> : Observable {
         scheduler: Scheduler
     ) where SourceValue.T == T {
 
-        let cached = MutableObservable(wrappedValue: source.wrappedValue)
+        let cached = StoredObservable(wrappedValue: source.wrappedValue)
         self.scheduler = scheduler
 
         self.cached = cached
@@ -53,12 +53,7 @@ class CachedObservable<T> : Observable {
         cached.subscribeActual(handler)
     }
 
-//    func publishUpdates() -> EventStream<T> {
-//
-//        cached.publishUpdates()
-//    }
-
-    private let cached: MutableObservable<T>
+    private let cached: StoredObservable<T>
     private let subscription: Subscription
 
     private let scheduler: Scheduler
