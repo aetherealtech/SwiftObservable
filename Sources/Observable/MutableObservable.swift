@@ -19,38 +19,29 @@ extension MutableObservable {
     }
 }
 
-@propertyWrapper public class AnyMutableObservable<T> : MutableObservable {
+@propertyWrapper public class AnyMutableObservable<T> :
+    AnyObservable<T>,
+    MutableObservable {
 
-    public var wrappedValue: T {
+    public override var wrappedValue: T {
 
-        get { getWrappedValue() }
+        get { super.wrappedValue }
         set { setWrappedValue(newValue) }
     }
 
-    public var projectedValue: AnyMutableObservable<T> {
+    public override var projectedValue: AnyMutableObservable<T> {
 
         self
     }
 
-    public func subscribeActual(
-        _ handler: @escaping (T) -> Void
-    ) -> Subscription {
-
-        subscribeActualImp(handler)
-    }
-
     public init<Erasing: MutableObservable>(erasing: Erasing) where Erasing.T == T {
 
-        getWrappedValue = { erasing.wrappedValue }
         setWrappedValue = { newValue in erasing.wrappedValue = newValue }
 
-        subscribeActualImp = { handler in erasing.subscribeActual(handler) }
+        super.init(erasing: erasing)
     }
 
-    private let getWrappedValue: () -> T
     private let setWrappedValue: (T) -> Void
-
-    private let subscribeActualImp: (@escaping (T) -> Void) -> Subscription
 }
 
 extension MutableObservable {
